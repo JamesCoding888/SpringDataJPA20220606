@@ -29,14 +29,47 @@
 	</bean>
 
 	<!-- 2. 配置 JPA 的 EntityManagerFactory -->
-	
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<!-- 2.1 定義 datasource -->
+		<property name="dataSource" ref="dataSource" />
+		
+		<!-- 2.2 定義 vendor -->
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+		</property>
+		<!-- 2.3 定義 entity 掃描區 -->
+		<property name="packagesToScan">
+			<list>
+				<value>com.spring.mvc</value>
+			</list>
+		</property>
+		
+		<!-- 2.4 jpa vendor 的配置設定 -->
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<!-- update 表示若資料表不存在，但是有 entity 就會自動新增 -->
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+	</bean>
 
 	<!-- 3. 配置事務管理器 -->
-	
+	<bean id="transactionManager" 
+		class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />	
+	</bean>
 	
 	<!-- 4. 配置支援註解@的事務 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
 	
 	
 	<!-- 5. 配置 Spring Data Jpa, base-package: 掃描 Repository Bean 所在的 package -->
-	
+	<jpa:repositories base-package="com.spring.mvc"
+		entity-manager-factory-ref="entityManagerFactory"
+		transaction-manager-ref="transactionManager" />
+		
 </beans>
