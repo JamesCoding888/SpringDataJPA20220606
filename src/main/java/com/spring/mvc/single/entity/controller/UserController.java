@@ -1,5 +1,6 @@
 package com.spring.mvc.single.entity.controller;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List; 
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +9,13 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.github.javafaker.Faker;
 import com.spring.mvc.single.entity.User;
@@ -25,7 +29,7 @@ public class UserController {
 	// 新增範例資料
 	@GetMapping("/test/create_sample_data")
 	@ResponseBody
-	public String testCreateSampleData() {
+	public String testCreateSampleData() { 
 		Faker faker = new Faker();
 		int count = 150;
 		for(int i=0;i<count;i++) {
@@ -33,6 +37,7 @@ public class UserController {
 			User user = new User();
 			user.setName(faker.name().lastName());
 			user.setPassword(String.format("%04d", r.nextInt(10000))); // %04d 意思是不足四位補 0
+			user.setBirth(faker.date().birthday());
 			// 儲存到資料庫
 			userRepository.saveAndFlush(user);
 			
@@ -46,11 +51,11 @@ public class UserController {
 		List<User> users = userRepository.findAll();
 		return users; 
 	}
-	// 查詢範例資料 2
+	//查詢範例資料 2
 	@GetMapping("/test/findall_sort")
 	@ResponseBody
-	public List<User> testFindallSort(){
-		// ASC 小->大 
+	public List<User> testFindallSort() {
+		// ASC 小->大
 		Sort sortByASC = new Sort(Sort.Direction.ASC, "name");
 		// DESC 大->小
 		// Sort sortByDESC = new Sort(Sort.Direction.DESC, "name");
@@ -71,7 +76,7 @@ public class UserController {
 	public List<User> testFindallExample() {
 		User user = new User();
 		user.setId(1L);
-		user.setPassword("0459");
+		user.setPassword("2222");
 		Example<User> example = Example.of(user);
 		List<User> users = userRepository.findAll(example);
 		return users;
@@ -99,11 +104,55 @@ public class UserController {
 	@GetMapping("/test/page/{no}")
 	@ResponseBody
 	public List<User> testPage(@PathVariable("no") Integer no) {
-		int pageNo = no; 
+		int pageNo = no;
 		int pageSize = 10;
+		// 排序
+		Sort.Order order1 = new Sort.Order(Sort.Direction.ASC, "name"); // name 由小到大
+		Sort.Order order2 = new Sort.Order(Sort.Direction.DESC, "id"); // id 由大到小
+		Sort sort = new Sort(order1, order2);
 		// 分頁請求
-		PageRequest pageRequest = new PageRequest(pageNo, pageSize);
+		PageRequest pageRequest = new PageRequest(pageNo, pageSize, sort);
 		Page<User> page = userRepository.findAll(pageRequest);
 		return page.getContent();
 	}
+	// 查詢 JPQL 1
+	@GetMapping("/test/name")
+	@ResponseBody
+	public List<User> getByName(@RequestParam("name") String name){
+		return userRepository.getByName(name); 
+	}
+	// 查詢 JPQL 2	
+	// 測試 url: /mvc/user/test/name/id/S/100
+	@GetMapping("test/name/id/{name}/{id}")
+	@ResponseBody
+	public List<User> getByNameAndID(@PathVariable("name") String name,    
+									 @PathVariable("id") Long id){
+		return userRepository.getByNameStartingWithAndIdGreaterThanEqual(name, id);
+		
+	}
+	//	 查詢 JPQL 3	
+	// 測試 url: /mvc/user/test/ids?ids=5,10,20,30,50
+	@GetMapping("/test/ids")
+	@ResponseBody
+	public List<User> getByIds(@RequestParam("ids") List<Long> ids) {
+		return userRepository.getByIdIn(ids);
+	}
+	// 查詢 JPQL 4	
+	// 測試 url: /mvc/user/test/birth?birth=1958-9-9
+	@GetMapping("test/birth")
+	@ResponseBody
+	public List<User> getByBirthLessThan(@RequestParam("birth") @DateTimeFormat(iso = ISO.DATE) Date birth) {
+		return userRepository.getByBirthLessThan(birth);
+	}
+	// 查詢 JPQL 5
+	// 測試 url: /mvc/user/test/birth_between?begin=1965-1-1&end=1966-12-31
+	@GetMapping("/test/birth_between")
+	@ResponseBody
+	public List<User> getByBirthBetween(@RequestParam("begin") @DateTimeFormat(iso = ISO.DATE) Date begin,
+										@RequestParam("end") @DateTimeFormat(iso = ISO.DATE) Date end) {
+		return userRepository.getByBirthBetween(begin, end);
+	}
+		
 }
+
+

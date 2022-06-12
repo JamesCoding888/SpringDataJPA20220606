@@ -1,5 +1,5 @@
 package com.spring.mvc.single.entity;
-import java.util.Date;
+import java.util.Date; 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,7 +29,7 @@ public class User {
 	@Column
 	@DateTimeFormat(pattern = "yyyy-MM-dd") // HTML form 表單呈現格式
 	@JsonFormat(pattern = "yyyy/MM/dd") // Json 字串呈現格式
-	private Date brith;
+	private Date birth;
 	
 	public Long getId() {
 		return id;
@@ -55,17 +55,17 @@ public class User {
 		this.password = password;
 	}
 
-	public Date getBrith() {
-		return brith;
+	public Date getBirth() {
+		return birth;
 	}
 
-	public void setBrith(Date brith) {
-		this.brith = brith;
+	public void setBirth(Date birth) {
+		this.birth = birth;
 	}
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", name=" + name + ", password=" + password + ", brith=" + brith + "]";
+		return "User [id=" + id + ", name=" + name + ", password=" + password + ", birth=" + birth + "]";
 	}
 	
 	
