@@ -10,4 +10,9 @@ SpringDataJPA20220606
 - JPA @註解說明 
 
 20211004
+- org.springframework.data.jpa.repository 說明 
+- hibernate.format_sql 
+- hibernate.show_sql 
+- JPQL
+
 
