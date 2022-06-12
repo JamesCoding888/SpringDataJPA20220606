@@ -1,5 +1,5 @@
 package com.spring.mvc.single.entity;
-import java.util.Date; 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +12,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
-@Table(name = "User")
+@Table(name = "User") // default User 會使用 MySQL 預設較高權限的資料表，裡面會加載很多資料欄位，建議不用 User
+//@Table(name = "User2")  // 建議修改成其它 Table 名稱
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,7 +30,7 @@ public class User {
 	@DateTimeFormat(pattern = "yyyy-MM-dd") // HTML form 表單呈現格式
 	@JsonFormat(pattern = "yyyy/MM/dd") // Json 字串呈現格式
 	private Date brith;
-
+	
 	public Long getId() {
 		return id;
 	}
