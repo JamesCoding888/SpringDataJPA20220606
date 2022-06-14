@@ -1,5 +1,5 @@
 package com.spring.mvc.single.entity.controller;
-import java.util.Arrays;
+import java.util.Arrays;  
 import java.util.Date;
 import java.util.List; 
 import java.util.Random;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,19 @@ import com.spring.mvc.single.entity.respository.UserRepository;
 public class UserController {
 	@Autowired
 	private UserRepository userRepository;
+
+	// User 資料維護首頁
+	@GetMapping(value = {"/", "/index"})
+	public String index(Model model) {
+		List<User> users = userRepository.findAll();
+		model.addAttribute("user", new User());
+		model.addAttribute("users", users);
+		return "user/index"; // 重導到 /WEB-INF/view/user/index.jsp
+	}
+	
+	// ---------------------------------------------------------------------------------------------
+	// 以下是測試 User 的程式
+	
 	// 新增範例資料
 	@GetMapping("/test/create_sample_data")
 	@ResponseBody
