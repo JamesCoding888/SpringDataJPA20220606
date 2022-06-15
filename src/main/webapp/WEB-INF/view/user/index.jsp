@@ -37,7 +37,8 @@
     				<form:input path="name" placeholder="請輸入使用者名稱" /><p />
     				<form:input path="password" placeholder="請輸入密碼" /><p />
     				<form:input path="birth" type="date" /><p />
-    				
+    				<input type="text" id="_method" name="_method"
+    					   readonly="true" value="${ _method }" /><p />    					       				
     				<button type="submit" class="pure-button pure-button-primary">Submit</button>
     				<button type="reset" class="pure-button pure-button-primary">Reset</button>
     			</fieldset>
@@ -66,7 +67,12 @@
     							<td>${ user.name }</td>
     							<td>${ user.password }</td>
     							<td>${ user.birth }</td>
-    							<td>Edit</td>
+    							<td>
+    								<button type="button" 
+	    								onclick="location.href='${ pageContext.request.contextPath }/mvc/user/${ user.id }';"
+	    								class="pure-button pure-button-primary">Edit    								
+    								</button>    								
+    							</td>
     							<td>Delete</td>    						
     						</tr>    					    					
     					</c:forEach>    				

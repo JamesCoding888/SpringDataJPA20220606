@@ -13,8 +13,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,12 +33,44 @@ public class UserController {
 
 	// User 資料維護首頁
 	@GetMapping(value = {"/", "/index"})
-	public String index(Model model) {
+	public String index(Model model) { 
 		List<User> users = userRepository.findAll();
 		model.addAttribute("user", new User());
 		model.addAttribute("users", users);
+		model.addAttribute("_method", "POST");
 		return "user/index"; // 重導到 /WEB-INF/view/user/index.jsp
 	}
+	
+	// User 新增 或 修改 
+	// SpringData 的機制，若新增的欄位有資料，則修改; 反之，則新增
+	@PostMapping(value = "/")
+	public String create(User user) {
+		userRepository.save(user);
+		return "redirect: ./";
+	}
+	// User 修改
+	@PutMapping(value = "/")
+	public String update(User user) {
+		userRepository.saveAndFlush(user);
+		return "redirect: ./";
+	}
+	// 根據 id 查詢單筆資料
+	@GetMapping("/{id}")
+	public String getUserById(Model model, @PathVariable Long id) {
+		User user = userRepository.findOne(id);
+		List<User> users = userRepository.findAll();
+		model.addAttribute("user", user);
+		model.addAttribute("users", users);
+		model.addAttribute("_method", "PUT");
+		return "user/index"; // 重導到 /WEB-INF/view/user/index.jsp
+	}
+	// User 刪除
+	@DeleteMapping(value = "/")
+	public String delete(User user) {
+		userRepository.delete(user.getId());
+		return "redirect: ./";
+	}
+	
 	
 	// ---------------------------------------------------------------------------------------------
 	// 以下是測試 User 的程式
